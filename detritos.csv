@@ -1,0 +1,6 @@
+codigo,nome,altitude_km,velocidade_kms,tamanho_m,nivel_risco
+101,Fragmento Cosmos 2251,780.5,7.8,1.2,Alto
+102,Estagio Foguete Ariane,620.0,7.5,3.8,Critico
+103,Porca Sextavada ISS,410.2,7.7,0.05,Baixo
+104,Painel Solar Inativo,850.1,7.4,2.1,Medio
+105,Ferramenta Perdida EVA,390.8,7.9,0.3,Baixo
