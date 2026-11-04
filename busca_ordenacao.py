@@ -79,3 +79,51 @@ def ordenar_por_codigo_simples(registros):
             if lista[j]["codigo"] > lista[j + 1]["codigo"]:
                 lista[j], lista[j + 1] = lista[j + 1], lista[j]
     return lista
+
+
+def ordenar_insercao(registros, chave, decrescente=True):
+    """
+    Ordena a lista de registros utilizando o algoritmo de ORDENAÇÃO POR INSERÇÃO.
+    Permite escolher qualquer chave/campo e a direção (decrescente por padrão).
+    
+    Retorna uma cópia ordenada da lista, preservando a lista original.
+    """
+    lista = registros[:]
+    for i in range(1, len(lista)):
+        atual = lista[i]
+        j = i - 1
+        
+        if decrescente:
+            # Para ordem decrescente: empurra os menores para a direita
+            while j >= 0 and lista[j][chave] < atual[chave]:
+                lista[j + 1] = lista[j]
+                j -= 1
+        else:
+            # Para ordem crescente: empurra os maiores para a direita
+            while j >= 0 and lista[j][chave] > atual[chave]:
+                lista[j + 1] = lista[j]
+                j -= 1
+                
+        lista[j + 1] = atual
+    return lista
+
+
+def ordenar_bolha(registros, chave, decrescente=True):
+    """
+    Ordena a lista de registros utilizando o algoritmo de ORDENAÇÃO POR BOLHA (Bubble Sort).
+    Permite escolher qualquer chave/campo e a direção (decrescente por padrão).
+    
+    Retorna uma cópia ordenada da lista, preservando a lista original.
+    """
+    lista = registros[:]
+    n = len(lista)
+    for i in range(n - 1):
+        trocou = False
+        for j in range(n - 1 - i):
+            condicao = (lista[j][chave] < lista[j + 1][chave]) if decrescente else (lista[j][chave] > lista[j + 1][chave])
+            if condicao:
+                lista[j], lista[j + 1] = lista[j + 1], lista[j]
+                trocou = True
+        if not trocou:
+            break
+    return lista

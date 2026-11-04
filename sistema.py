@@ -1,7 +1,9 @@
 import csv
+from pilha_alertas import PilhaAlertas
 
 ARQUIVO_CSV = "detritos.csv"
 detritos = []
+pilha_alertas = PilhaAlertas()
 
 from busca_ordenacao import (
     busca_sequencial, 
@@ -86,6 +88,26 @@ def buscar_detrito():
     print(f"  • Busca Binária Iterativa: {comp_bin} comparações")
     print(f"  • Busca Binária Recursiva: {comp_rec} comparações")
 
+from busca_ordenacao import (
+    busca_sequencial, 
+    busca_binaria, 
+    busca_binaria_recursiva, 
+    ordenar_por_codigo_simples,
+    ordenar_insercao
+)
+
+def exibir_ranking_tamanho():
+    if not detritos:
+        print("\nNenhum detrito cadastrado para gerar o ranking.")
+        return
+
+    # Ordena por inserção no campo 'tamanho_m' em ordem decrescente (do maior para o menor)
+    ranking = ordenar_insercao(detritos, "tamanho_m", decrescente=True)
+
+    print("\n--- RANKING DE DETRITOS POR TAMANHO (MAIOR PARA O MENOR) ---")
+    for i, d in enumerate(ranking, 1):
+        print(f"{i}º | ID: {d['codigo']} | Nome: {d['nome']} | Tamanho: {d['tamanho_m']}m | Risco: {d['nivel_risco']}")
+
 
 def cadastrar_detrito():
     print("\n--- CADASTRO DE DETRITO ESPACIAL ---")
@@ -152,6 +174,66 @@ def ler_float_positivo(mensagem, minimo=0.0):
         except ValueError:
             print("Entrada inválida. Digite um número decimal válido.")
 
+def gerenciar_pilha_alertas():
+    print("\n--- GERENCIAMENTO DE PILHA DE ALERTAS DE COLISÃO (LIFO) ---")
+    print("1 - Registrar / Empilhar Novo Alerta (Push)")
+    print("2 - Processar / Desempilhar Alerta Mais Recente (Pop)")
+    print("3 - Visualizar Alerta do Topo (Peek)")
+    print("4 - Listar Todos os Alertas Empilhados")
+    print("0 - Voltar")
+    
+    opcao = input("Escolha uma opção: ").strip()
+
+    if opcao == "1":
+        if not detritos:
+            print("Nenhum detrito cadastrado para associar ao alerta.")
+            return
+        
+        codigo = ler_inteiro("Código do detrito em rota de colisão: ")
+        pos, _ = busca_sequencial(detritos, codigo)
+        if pos == -1:
+            print("Detrito não encontrado.")
+            return
+
+        detrito = detritos[pos]
+        descricao = input("Descrição do evento / Objeto ameaçado: ").strip()
+        alerta = {
+            "codigo_detrito": detrito["codigo"],
+            "nome_detrito": detrito["nome"],
+            "nivel_risco": detrito["nivel_risco"],
+            "descricao": descricao
+        }
+        pilha_alertas.push(alerta)
+        print(f"\n✓ Alerta empilhado com sucesso para o detrito '{detrito['nome']}'!")
+
+    elif opcao == "2":
+        alerta = pilha_alertas.pop()
+        if alerta:
+            print(f"\n✓ Alerta processado e removido do topo:")
+            print(f"  Detrito: {alerta['nome_detrito']} (ID: {alerta['codigo_detrito']}) | Risco: {alerta['nivel_risco']}")
+            print(f"  Evento: {alerta['descricao']}")
+        else:
+            print("\nA pilha de alertas está vazia.")
+
+    elif opcao == "3":
+        alerta = pilha_alertas.peek()
+        if alerta:
+            print(f"\n▲ Alerta no TOPO da pilha:")
+            print(f"  Detrito: {alerta['nome_detrito']} (ID: {alerta['codigo_detrito']}) | Risco: {alerta['nivel_risco']}")
+            print(f"  Evento: {alerta['descricao']}")
+        else:
+            print("\nA pilha de alertas está vazia.")
+
+    elif opcao == "4":
+        if pilha_alertas.is_empty():
+            print("\nA pilha de alertas está vazia.")
+            return
+        
+        print(f"\n=== PILHA DE ALERTAS ({pilha_alertas.size()} pendentes) - DO TOPO PARA A BASE ===")
+        for i, a in enumerate(pilha_alertas.listar_alertas(), 1):
+            print(f"{i}. Detrito: {a['nome_detrito']} (ID: {a['codigo_detrito']}) | Risco: {a['nivel_risco']} | Evento: {a['descricao']}")
+
+
 
 def main():
   """Laço principal do menu inicial."""
@@ -161,6 +243,8 @@ def main():
     print("1 - Cadastrar Detritos Espaciais")
     print("2 - Listar Detritos Espaciais")
     print("3 - Busca Detrito por Código")
+    print("4 - Ranking por Tamanho (Ordenação por Inserção)")
+    print("5 - Gerenciar Pilha de Alertas de Colisão")
     print("0 - Sair")
     opcao = input("Opção: ").strip()
 
@@ -169,7 +253,11 @@ def main():
     elif opcao == "2":
        listar_detritos()
     elif opcao == "3":
-       buscar_detrito()   
+       buscar_detrito()  
+    elif opcao == "4":
+      exibir_ranking_tamanho()
+    elif opcao == "5" :
+       gerenciar_pilha_alertas()  
     elif opcao == "0":
       print("Encerrando o OrbitGuard. Até logo!")
       break
