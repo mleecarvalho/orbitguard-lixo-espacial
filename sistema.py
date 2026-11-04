@@ -48,22 +48,91 @@ def listar_detritos():
     )
   print("=" * 80)
 
+def cadastrar_detrito(coletas):
+    print("\n--- CADASTRO DE DETRITO ESPACIAL ---")
+ 
+  # 1. Validação de Código Único
+    while True:
+        codigo = ler_inteiro("Código (ID único): ")
+        posicao, _ = busca_sequencial(coletas, codigo)
+        if posicao == -1:
+            break
+        print("Erro: Já existe um detrito cadastrado com este código.")
+
+    # 2. Nome do Objeto
+    nome = input("Nome / Identificação do objeto: ").strip()
+    while not nome:
+        print("O nome não pode ser vazio.")
+        nome = input("Nome / Identificação do objeto: ").strip()
+
+    # 3. Altitude (> 100 km)
+    altitude_km = ler_float_positivo("Altitude (km, > 100): ", minimo=100.0)
+
+    # 4. Velocidade (> 0 km/s)
+    velocidade_kms = ler_float_positivo("Velocidade (km/s, > 0): ", minimo=0.0)
+
+    # 5. Tamanho (> 0 m)
+    tamanho_m = ler_float_positivo("Tamanho (m, > 0): ", minimo=0.0)
+
+    # 6. Nível de Risco (Lista fixa)
+    riscos_validos = ["Baixo", "Médio", "Alto", "Crítico"]
+    print(f"Níveis de risco aceitos: {', '.join(riscos_validos)}")
+    nivel_risco = input("Nível de risco: ").strip().capitalize()
+    while nivel_risco not in riscos_validos:
+        print("Nível de risco inválido. Escolha entre: Baixo, Médio, Alto ou Crítico.")
+        nivel_risco = input("Nível de risco: ").strip().capitalize()
+
+    # Estruturação e Persistência
+    novo_detrito = {
+        "codigo": codigo,
+        "nome": nome,
+        "altitude_km": altitude_km,
+        "velocidade_kms": velocidade_kms,
+        "tamanho_m": tamanho_m,
+        "nivel_risco": nivel_risco
+    }
+    
+    coletas.append(novo_detrito)
+    salvar_dados(coletas)
+    print(f"\nDetrito '{nome}' (Código: {codigo}) cadastrado e salvo com sucesso!")
+
+def ler_inteiro(mensagem):
+    while True:
+        try:
+            return int(input(mensagem).strip())
+        except ValueError:
+            print("Entrada inválida. Digite um número inteiro válido.")
+
+def ler_float_positivo(mensagem, minimo=0.0):
+    while True:
+        try:
+            valor = float(input(mensagem).strip())
+            if valor > minimo:
+                return valor
+            print(f"O valor deve ser maior que {minimo}.")
+        except ValueError:
+            print("Entrada inválida. Digite um número decimal válido.")
+
+
 def main():
   """Laço principal do menu inicial."""
-  carregar_dados()
+  coletas = carregar_dados()
   while True:
     print("\n--- ORBITGUARD: MONITORAMENTO DE DETRITOS ---")
-    print("1 - Listar Detritos Espaciais")
+    print("1 - Cadastrar Detrito Espacial")
+    print("2 - Listar Detritos Espaciais")
     print("0 - Sair")
     opcao = input("Opção: ").strip()
 
     if opcao == "1":
-      listar_detritos()
+        cadastrar_detrito(coletas)
+    elif opcao == "2":
+       listar_detritos(coletas)
     elif opcao == "0":
-      print("Encerrando o sistema...")
+      print("Encerrando o OrbitGuard. Até logo!")
       break
     else:
-      print("Opção inválida! Tente novamente.")
+      print("Opção inválida! Digite novamente.")
 
 
 if __name__ == "__main__":
