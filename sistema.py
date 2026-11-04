@@ -3,6 +3,13 @@ import csv
 ARQUIVO_CSV = "detritos.csv"
 detritos = []
 
+from busca_ordenacao import (
+    busca_sequencial, 
+    busca_binaria, 
+    busca_binaria_recursiva, 
+    ordenar_por_codigo_simples
+)
+
 def carregar_dados():
   """Lê os registros do arquivo CSV e armazena na lista detritos."""
   detritos.clear()
@@ -48,13 +55,45 @@ def listar_detritos():
     )
   print("=" * 80)
 
-def cadastrar_detrito(coletas):
+def buscar_detrito():
+    if not detritos:
+        print("\nNenhum detrito cadastrado para busca.")
+        return
+
+    print("\n--- BUSCA DE DETRITO POR CÓDIGO ---")
+    codigo = ler_inteiro("Digite o código do detrito a buscar: ")
+
+    # 1. Busca Sequencial na lista original
+    pos_seq, comp_seq = busca_sequencial(detritos, codigo)
+
+    # 2. Busca Binária na lista ordenada por código
+    coletas_ordenadas = ordenar_por_codigo_simples(detritos)
+    pos_bin, comp_bin = busca_binaria(coletas_ordenadas, codigo)
+    pos_rec, comp_rec = busca_binaria_recursiva(coletas_ordenadas, codigo)
+
+    # Exibição dos resultados e contagem de comparações
+    if pos_seq != -1:
+        detrito = detritos[pos_seq]
+        print(f"\n✓ Detrito encontrado!")
+        print(f"  ID: {detrito['codigo']} | Nome: {detrito['nome']}")
+        print(f"  Altitude: {detrito['altitude_km']} km | Velocidade: {detrito['velocidade_kms']} km/s")
+        print(f"  Tamanho: {detrito['tamanho_m']} m | Nível de Risco: {detrito['nivel_risco']}")
+    else:
+        print(f"\n✗ Nenhum detrito encontrado com o código {codigo}.")
+
+    print("\n--- METRICAS DE DESEMPENHO DA BUSCA ---")
+    print(f"  • Busca Sequencial: {comp_seq} comparações")
+    print(f"  • Busca Binária Iterativa: {comp_bin} comparações")
+    print(f"  • Busca Binária Recursiva: {comp_rec} comparações")
+
+
+def cadastrar_detrito():
     print("\n--- CADASTRO DE DETRITO ESPACIAL ---")
  
   # 1. Validação de Código Único
     while True:
         codigo = ler_inteiro("Código (ID único): ")
-        posicao, _ = busca_sequencial(coletas, codigo)
+        posicao, _ = busca_sequencial(detritos, codigo)
         if posicao == -1:
             break
         print("Erro: Já existe um detrito cadastrado com este código.")
@@ -116,18 +155,21 @@ def ler_float_positivo(mensagem, minimo=0.0):
 
 def main():
   """Laço principal do menu inicial."""
-  coletas = carregar_dados()
+  carregar_dados()
   while True:
     print("\n--- ORBITGUARD: MONITORAMENTO DE DETRITOS ---")
-    print("1 - Cadastrar Detrito Espacial")
+    print("1 - Cadastrar Detritos Espaciais")
     print("2 - Listar Detritos Espaciais")
+    print("3 - Busca Detrito por Código")
     print("0 - Sair")
     opcao = input("Opção: ").strip()
 
     if opcao == "1":
-        cadastrar_detrito(coletas)
+        cadastrar_detrito()
     elif opcao == "2":
-       listar_detritos(coletas)
+       listar_detritos()
+    elif opcao == "3":
+       buscar_detrito()   
     elif opcao == "0":
       print("Encerrando o OrbitGuard. Até logo!")
       break
