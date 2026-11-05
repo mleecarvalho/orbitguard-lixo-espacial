@@ -1,0 +1,16 @@
+cat << 'EOF' > .gitignore
+# Arquivos compilados do Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ambientes virtuais
+.venv/
+venv/
+ENV/
+
+# Configurações de IDE / VS Code locais
+.vscode/
+.DS_Store
+EOF
