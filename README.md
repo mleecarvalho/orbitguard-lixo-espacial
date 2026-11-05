@@ -39,37 +39,47 @@ orbitguard/
 
 ## 💻 Funcionalidades do Sistema
 
-Cadastro Validado de Detritos: Leitura e validação estrita dos campos codigo (inteiro único), nome, altitude_km (> 100 km), velocidade_kms (> 0), tamanho_m (> 0) e nivel_risco (Baixo, Médio, Alto, Crítico).
-Listagem Geral: Apresentação formatada da base de dados em tabelas com bordas ASCII.
-Consultas Algorítmicas por Código: Busca Sequencial e Busca Binária (iterativa e recursiva), retornando a posição do elemento e o número de comparações efetuadas.
-Ranking por Tamanho/Massa: Ordenação manual por Inserção (em ordem decrescente) sem a utilização de atalhos nativos (sort() / sorted()).
-Auditoria de Alertas Críticos (Pilha LIFO): Empilhamento (push) e desempilhamento (pop) de eventos de risco iminente para auditoria rápida de segurança.
-Relatório de Desempenho Algorítmico: Simulação experimental comparando o consumo de comparações de busca em cenários de 100, 1.000 e 10.000 registros fictícios no pior caso.
+**Cadastro Validado de Detritos:** Leitura e validação estrita dos campos codigo (inteiro único), nome, altitude_km (> 100 km), velocidade_kms (> 0), tamanho_m (> 0) e nivel_risco (Baixo, Médio, Alto, Crítico).
+
+**Listagem Geral:** Apresentação formatada da base de dados em tabelas com bordas ASCII.
+
+**Consultas Algorítmicas por Código:** Busca Sequencial e Busca Binária (iterativa e recursiva), retornando a posição do elemento e o número de comparações efetuadas.
+
+**Ranking por Tamanho/Massa:** Ordenação manual por Inserção (em ordem decrescente) sem a utilização de atalhos nativos (sort() / sorted()).
+
+**Auditoria de Alertas Críticos (Pilha LIFO):** Empilhamento (push) e desempilhamento (pop) de eventos de risco iminente para auditoria rápida de segurança.
+
+**Relatório de Desempenho Algorítmico:** Simulação experimental comparando o consumo de comparações de busca em cenários de 100, 1.000 e 10.000 registros fictícios no pior caso.
+
 
 ## ⚡ Experimento de Desempenho Algorítmico
 
-Para avaliar quantitativamente a eficiência computacional das técnicas de busca, o sistema executa um teste em memória comparando o pior caso (busca por um registro inexistente):
-Quantidade de Registros ($N$)	Busca Sequencial ($O(n)$)	Busca Binária ($O(\log n)$)	Redução de Processamento (%)
-100	100 comparações	7 comparações	93,00%
-1.000	1.000 comparações	10 comparações	99,00%
-10.000	10.000 comparações	14 comparações	99,86%
-Conclusão Técnica: A Busca Binária demonstra eficiência exponencialmente superior para bases extensas, reduzindo em mais de 99,8% o número de testes lógicos exigidos em relação à Busca Sequencial.
+Para avaliar quantitativamente a eficiência computacional das técnicas de busca no pior caso (pesquisa por um registro inexistente), o sistema executa um teste comparativo em memória utilizando diferentes cardinalidades de dados:
+
+| Quantidade de Registros ($N$) | Busca Sequencial ($O(n)$) | Busca Binária ($O(\log n)$) | Redução de Processamento (%) |
+| :---: | :---: | :---: | :---: |
+| **100** | 100 comparações | 7 comparações | **93,00%** |
+| **1.000** | 1.000 comparações | 10 comparações | **99,00%** |
+| **10.000** | 10.000 comparações | 14 comparações | **99,86%** |
+
+> **Conclusão Técnica:** A Busca Binária demonstra eficiência exponencialmente superior para bases extensas, reduzindo em mais de 99,8% o número de testes lógicos exigidos em relação à Busca Sequencial.
 
 ---
 
-## 📋 Tabela de Rastreamento de Desenvolvimento
+## 📋 Tabela de Rastreamento do Desenvolvimento
 
-Etapa	Componente / Foco Técnico	Mensagem de Commit Padrão	Status
-Etapa 1	Base inicial em detritos.csv com registros fictícios formatados.	feat: adiciona base de dados inicial em arquivo CSV (detritos.csv)	CONCLUÍDO
-Etapa 2	Funções carregar_dados() / salvar_dados() e menu TUI base.	feat: implementa leitura e listagem de dados do arquivo CSV em sistema.py	CONCLUÍDO
-Etapa 3	Função cadastrar_detrito() com validação estrita de regras.	feat: adiciona funcao de cadastro de detritos com validacao de regras	CONCLUÍDO
-Etapa 4	Algoritmos de Busca Sequencial e Binária (iterativa/recursiva).	feat: implementa busca sequencial e binaria iterativa/recursiva	CONCLUÍDO
-Etapa 5	Algoritmos manuais de Ordenação por Inserção e Bolha.	feat: implementa ordenacao por insercao e bolha para ranking	CONCLUÍDO
-Etapa 6	Módulo pilha_alertas.py para gestão LIFO de alertas de colisão.	feat: implementa pilha para auditoria de alertas de colisaos recentes	CONCLUÍDO
-Etapa 7	Experimento comparativo de desempenho com contagem de comparações.	feat: adiciona relatorio de comparacao de desempenho das buscas	CONCLUÍDO
-Etapa 8	Refatoração visual da interface TUI/Clipper com bordas ASCII.	style: finaliza interface TUI estilo Clipper com bordas ASCII e relatorios	CONCLUÍDO
-Etapa 9	Elaboração do relatório científico (artigo ABNT em PDF).	docs: finaliza relatorio de artigo cientifico do projeto integrador	CONCLUÍDO
-Etapa 10	Gravação do vídeo demonstrativo (3 a 5 min) e publicação de links.	docs: adiciona link do video demonstrativo no README e artigo	Pendente
+| Etapa | Componente / Foco Técnico | Mensagem de Commit Padrão | Status |
+| :---: | :--- | :--- | :---: |
+| **Etapa 1** | Base inicial em `detritos.csv` com registros fictícios formatados. | `feat: adiciona base de dados inicial em arquivo CSV (detritos.csv)` | **CONCLUÍDO** |
+| **Etapa 2** | Funções `carregar_dados()` / `salvar_dados()` e menu TUI base em `sistema.py`. | `feat: implementa leitura e listagem de dados do arquivo CSV em sistema.py` | **CONCLUÍDO** |
+| **Etapa 3** | Função `cadastrar_detrito()` com validações estritas de regras de negócio. | `feat: adiciona funcao de cadastro de detritos com validacao de regras` | **CONCLUÍDO** |
+| **Etapa 4** | Algoritmos de Busca Sequencial e Binária (iterativa/recursiva) em `busca_ordenacao.py`. | `feat: implementa busca sequencial e binaria iterativa/recursiva` | **CONCLUÍDO** |
+| **Etapa 5** | Algoritmos manuais de Ordenação por Inserção e Bolha em `busca_ordenacao.py`. | `feat: implementa ordenacao por insercao e bolha para ranking` | **CONCLUÍDO** |
+| **Etapa 6** | Módulo `pilha_alertas.py` para gestão de alertas de colisão (Pilha LIFO). | `feat: implementa pilha para auditoria de alertas de colisaos recentes` | **CONCLUÍDO** |
+| **Etapa 7** | Experimento comparativo de desempenho contabilizando contagem de comparações. | `feat: adiciona relatorio de comparacao de desempenho das buscas` | **CONCLUÍDO** |
+| **Etapa 8** | Refatoração visual da interface TUI/Clipper, formatação de tabelas e menus ASCII. | `style: finaliza interface TUI estilo Clipper com bordas ASCII e relatorios` | **CONCLUÍDO** |
+| **Etapa 9** | Elaboração do relatório científico (artigo de 15 a 25 páginas) nas normas ABNT. | `docs: finaliza relatorio de artigo cientifico do projeto integrador` | **CONCLUÍDO** |
+| **Etapa 10** | Gravação do vídeo demonstrativo (3 a 5 min) e publicação dos links. | `docs: adiciona link do video demonstrativo no README e artigo` | **PENDENTE** |
 ---
 
 ## 🚀 Como Executar o Projeto
