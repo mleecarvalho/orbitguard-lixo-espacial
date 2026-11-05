@@ -273,18 +273,27 @@ def executar_experimento_desempenho():
     print("=" * 70 + "\n")
 
 
+def exibir_cabecalho(titulo: str):
+    print("\n" + "=" * 70)
+    print(f"{titulo.center(70)}")
+    print("=" * 70)
+
+def exibir_menu_principal():
+    exibir_cabecalho("ORBITGUARD - SISTEMA DE MONITORAMENTO ORBITAL")
+    print(" [1] Cadastrar Detrito Espacial")
+    print(" [2] Listar Todos os Detritos")
+    print(" [3] Buscar Detrito por Código (Sequencial vs Binária)")
+    print(" [4] Ranking por Tamanho (Ordenação por Inserção)")
+    print(" [5] Auditoria de Alertas Críticos (Estrutura de Pilha)")
+    print(" [6] Experimento de Desempenho Algorítmico")
+    print(" [0] Sair do Sistema")
+    print("-" * 70)
+
 def main():
   """Laço principal do menu inicial."""
   carregar_dados()
   while True:
-    print("\n--- ORBITGUARD: MONITORAMENTO DE DETRITOS ---")
-    print("1 - Cadastrar Detritos Espaciais")
-    print("2 - Listar Detritos Espaciais")
-    print("3 - Busca Detrito por Código")
-    print("4 - Ranking por Tamanho (Ordenação por Inserção)")
-    print("5 - Gerenciar Pilha de Alertas de Colisão")
-    print("6 - Experimento de Desempenho")
-    print("0 - Sair")
+    exibir_menu_principal()
     opcao = input("Opção: ").strip()
 
     if opcao == "1":
