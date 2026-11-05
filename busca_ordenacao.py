@@ -1,3 +1,5 @@
+import random
+
 # ==============================================================================
 # ORBITGUARD - MÓDULO DE BUSCA E ORDENAÇÃO
 # ==============================================================================
@@ -127,3 +129,23 @@ def ordenar_bolha(registros, chave, decrescente=True):
         if not trocou:
             break
     return lista
+
+
+def gerar_detritos_ficticios(qtd: int) -> list:
+    """
+    Gera uma lista com 'qtd' registros fictícios de detritos espaciais
+    com códigos numéricos únicos de 1 a qtd.
+    """
+    niveis = ["Baixo", "Médio", "Alto", "Crítico"]
+    dados = []
+    for i in range(1, qtd + 1):
+        detrito = {
+            "codigo": i,
+            "nome": f"DEBRIS-{i:05d}",
+            "altitude_km": round(random.uniform(160, 2000), 2),
+            "velocidade_kms": round(random.uniform(7.0, 11.0), 2),
+            "tamanho_m": round(random.uniform(0.01, 15.0), 2),
+            "nivel_risco": random.choice(niveis)
+        }
+        dados.append(detrito)
+    return dados

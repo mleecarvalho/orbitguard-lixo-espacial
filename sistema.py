@@ -1,4 +1,5 @@
 import csv
+import busca_ordenacao as buscaOrdenacao
 from pilha_alertas import PilhaAlertas
 
 ARQUIVO_CSV = "detritos.csv"
@@ -153,8 +154,7 @@ def cadastrar_detrito():
         "nivel_risco": nivel_risco
     }
     
-    coletas.append(novo_detrito)
-    salvar_dados(coletas)
+    detritos.append(novo_detrito)
     print(f"\nDetrito '{nome}' (Código: {codigo}) cadastrado e salvo com sucesso!")
 
 def ler_inteiro(mensagem):
@@ -233,6 +233,44 @@ def gerenciar_pilha_alertas():
         for i, a in enumerate(pilha_alertas.listar_alertas(), 1):
             print(f"{i}. Detrito: {a['nome_detrito']} (ID: {a['codigo_detrito']}) | Risco: {a['nivel_risco']} | Evento: {a['descricao']}")
 
+def executar_experimento_desempenho():
+    """
+    Executa o experimento comparativo entre Busca Sequencial e Busca Binária
+    em cenários de 100, 1.000 e 10.000 registros fictícios no pior caso.
+    """
+    tamanhos = [100, 1000, 10000]
+    
+    print("\n" + "=" * 70)
+    print("      EXPERIMENTO DE DESEMPENHO: BUSCA SEQUENCIAL VS. BINÁRIA")
+    print("=" * 70)
+    print(f"{'Registros (N)':<15} | {'Busca Sequencial (Comp.)':<26} | {'Busca Binária (Comp.)':<22}")
+    print("-" * 70)
+    
+    for qtd in tamanhos:
+        # 1. Gerar dados fictícios
+        registros = buscaOrdenacao.gerar_detritos_ficticios(qtd)
+        
+        # 2. Definir o alvo para o PIOR CASO (código inexistente)
+        codigo_alvo = -1 
+        
+        # 3. Teste na Busca Sequencial (não exige ordenação)
+        _, comp_seq = busca_sequencial(registros, codigo_alvo)
+        
+        # 4. A Busca Binária exige pré-ordenação pela chave 'codigo'
+        registros_ordenados = sorted(registros, key=lambda x: x["codigo"])
+        
+        # 5. Teste na Busca Binária
+        _, comp_bin = busca_binaria(registros_ordenados, codigo_alvo)
+        
+        # 6. Exibição formatada dos resultados
+        print(f"{qtd:<15,d} | {comp_seq:<26,d} | {comp_bin:<22,d}".replace(",", "."))
+        
+    print("=" * 70)
+    print("Análise:")
+    print(" - A Busca Sequencial possui complexidade O(n), crescendo linearmente.")
+    print(" - A Busca Binária possui complexidade O(log n), exigindo no máximo")
+    print("   14 comparações mesmo para 10.000 registros.")
+    print("=" * 70 + "\n")
 
 
 def main():
@@ -245,6 +283,7 @@ def main():
     print("3 - Busca Detrito por Código")
     print("4 - Ranking por Tamanho (Ordenação por Inserção)")
     print("5 - Gerenciar Pilha de Alertas de Colisão")
+    print("6 - Experimento de Desempenho")
     print("0 - Sair")
     opcao = input("Opção: ").strip()
 
@@ -258,6 +297,8 @@ def main():
       exibir_ranking_tamanho()
     elif opcao == "5" :
        gerenciar_pilha_alertas()  
+    elif opcao == "6":
+        executar_experimento_desempenho()
     elif opcao == "0":
       print("Encerrando o OrbitGuard. Até logo!")
       break
