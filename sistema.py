@@ -44,26 +44,19 @@ def listar_detritos():
         print(f"\n{YELLOW}Nenhum detrito cadastrado na base.{RESET}")
         return
 
-    exibir_cabecalho("CATÁLOGO ORBITAL DE DETRITOS (LEO)")
+    exibir_cabecalho("CATÁLOGO ORBITAL DE DETRITOS (LEO)", largura=94)
 
-    # Cabeçalho da tabela com fundo Azul estilo Clipper
-
-    print(f"{BG_BLUE}{WHITE}{BOLD}{'CÓDIGO':<8} | {'NOME':<15} | {'ALTITUDE (KM)':<14} | {'VEL. (KM/S)':<12} | {'TAM. (M)':<9} | {'RISCO':<8}{RESET}")
-    print(f"{BLUE}{'-'*75}{RESET}")
+    print(f"{BG_BLUE}{WHITE}{BOLD}| {'CÓDIGO':<8} | {'NOME':<25} | {'ALTITUDE (KM)':>13} | {'VEL. (KM/S)':>11} | {'TAM. (M)':>9} | {'RISCO':<9} |{RESET}")
+    print(f"{BLUE}{'-' * 94}{RESET}")
 
     for d in detritos:
-        # Cor condicional por nível de risco
         risco = d['nivel_risco']
-        if risco == "Crítico":
-            cor_risco = f"{RED}{BOLD}"
-        elif risco == "Alto":
-            cor_risco = f"{YELLOW}"
-        else:
-            cor_risco = f"{GREEN}"
+        cor_risco = cor_nivel_risco(risco)
+        nome = d['nome'] if len(d['nome']) <= 25 else d['nome'][:22] + "..."
 
-        print(f"{WHITE}{d['codigo']:<8}{RESET} | {CYAN}{d['nome']:<15}{RESET} | {WHITE}{d['altitude_km']:<14.2f}{RESET} | {WHITE}{d['velocidade_kms']:<12.2f}{RESET} | {WHITE}{d['tamanho_m']:<9.2f}{RESET} | {cor_risco}{risco:<8}{RESET}")
+        print(f"| {WHITE}{d['codigo']:<8}{RESET} | {CYAN}{nome:<25}{RESET} | {WHITE}{d['altitude_km']:>13.2f}{RESET} | {WHITE}{d['velocidade_kms']:>11.2f}{RESET} | {WHITE}{d['tamanho_m']:>9.2f}{RESET} | {cor_risco}{risco:<9}{RESET} |")
 
-    print(f"{BLUE}{'='*75}{RESET}\n")
+    print(f"{BLUE}{'=' * 94}{RESET}\n")
 
 def buscar_detrito():
     if not detritos:
@@ -112,9 +105,26 @@ def exibir_ranking_tamanho():
     # Ordena por inserção no campo 'tamanho_m' em ordem decrescente (do maior para o menor)
     ranking = ordenar_insercao(detritos, "tamanho_m", decrescente=True)
 
-    print("\n--- RANKING DE DETRITOS POR TAMANHO (MAIOR PARA O MENOR) ---")
+    exibir_cabecalho("RANKING DE DETRITOS POR TAMANHO", largura=94)
+    print(f"{BG_BLUE}{WHITE}{BOLD}| {'POS.':>5} | {'CÓDIGO':<8} | {'NOME':<38} | {'TAMANHO (M)':>16} | {'RISCO':<11} |{RESET}")
+    print(f"{BLUE}{'-' * 94}{RESET}")
     for i, d in enumerate(ranking, 1):
-        print(f"{i}º | ID: {d['codigo']} | Nome: {d['nome']} | Tamanho: {d['tamanho_m']}m | Risco: {d['nivel_risco']}")
+        risco = d['nivel_risco']
+        cor_risco = cor_nivel_risco(risco)
+        nome = d['nome'] if len(d['nome']) <= 38 else d['nome'][:35] + "..."
+        print(f"| {WHITE}{i:>5}{RESET} | {WHITE}{d['codigo']:<8}{RESET} | {CYAN}{nome:<38}{RESET} | {WHITE}{d['tamanho_m']:>16.2f}{RESET} | {cor_risco}{risco:<11}{RESET} |")
+    print(f"{BLUE}{'=' * 94}{RESET}\n")
+
+
+def cor_nivel_risco(risco):
+    risco_normalizado = risco.casefold()
+    if risco_normalizado in ("crítico", "critico"):
+        return f"{RED}{BOLD}"
+    if risco_normalizado == "alto":
+        return YELLOW
+    if risco_normalizado in ("médio", "medio"):
+        return CYAN
+    return GREEN
 
 
 def cadastrar_detrito():
@@ -182,63 +192,72 @@ def ler_float_positivo(mensagem, minimo=0.0):
             print("Entrada inválida. Digite um número decimal válido.")
 
 def gerenciar_pilha_alertas():
-    print("\n--- GERENCIAMENTO DE PILHA DE ALERTAS DE COLISÃO (LIFO) ---")
-    print("1 - Registrar / Empilhar Novo Alerta (Push)")
-    print("2 - Processar / Desempilhar Alerta Mais Recente (Pop)")
-    print("3 - Visualizar Alerta do Topo (Peek)")
-    print("4 - Listar Todos os Alertas Empilhados")
-    print("0 - Voltar")
-    
-    opcao = input("Escolha uma opção: ").strip()
+    while True:
+        limpar_tela()
+        exibir_cabecalho("GERENCIAMENTO DE ALERTAS (PILHA LIFO)")
+        print(f"{BG_BLUE}{WHITE}{BOLD}+{'-' * 73}+{RESET}")
+        exibir_item_menu("1", "Registrar e empilhar novo alerta")
+        exibir_item_menu("2", "Processar alerta mais recente")
+        exibir_item_menu("3", "Visualizar alerta do topo")
+        exibir_item_menu("4", "Listar alertas pendentes")
+        exibir_item_menu("0", "Voltar ao menu principal")
+        print(f"{BG_BLUE}{WHITE}{BOLD}+{'-' * 73}+{RESET}\n")
 
-    if opcao == "1":
-        if not detritos:
-            print("Nenhum detrito cadastrado para associar ao alerta.")
-            return
-        
-        codigo = ler_inteiro("Código do detrito em rota de colisão: ")
-        pos, _ = busca_sequencial(detritos, codigo)
-        if pos == -1:
-            print("Detrito não encontrado.")
+        opcao = input("Escolha uma opção: ").strip()
+
+        if opcao == "0":
+            print("Voltando ao menu principal.")
             return
 
-        detrito = detritos[pos]
-        descricao = input("Descrição do evento / Objeto ameaçado: ").strip()
-        alerta = {
-            "codigo_detrito": detrito["codigo"],
-            "nome_detrito": detrito["nome"],
-            "nivel_risco": detrito["nivel_risco"],
-            "descricao": descricao
-        }
-        pilha_alertas.push(alerta)
-        print(f"\n✓ Alerta empilhado com sucesso para o detrito '{detrito['nome']}'!")
+        if opcao == "1":
+            if not detritos:
+                print("Nenhum detrito cadastrado para associar ao alerta.")
+            else:
+                codigo = ler_inteiro("Código do detrito em rota de colisão: ")
+                pos, _ = busca_sequencial(detritos, codigo)
+                if pos == -1:
+                    print("Detrito não encontrado.")
+                else:
+                    detrito = detritos[pos]
+                    descricao = input("Descrição do evento / Objeto ameaçado: ").strip()
+                    alerta = {
+                        "codigo_detrito": detrito["codigo"],
+                        "nome_detrito": detrito["nome"],
+                        "nivel_risco": detrito["nivel_risco"],
+                        "descricao": descricao
+                    }
+                    pilha_alertas.push(alerta)
+                    print(f"\n✓ Alerta empilhado com sucesso para o detrito '{detrito['nome']}'!")
 
-    elif opcao == "2":
-        alerta = pilha_alertas.pop()
-        if alerta:
-            print(f"\n✓ Alerta processado e removido do topo:")
-            print(f"  Detrito: {alerta['nome_detrito']} (ID: {alerta['codigo_detrito']}) | Risco: {alerta['nivel_risco']}")
-            print(f"  Evento: {alerta['descricao']}")
+        elif opcao == "2":
+            alerta = pilha_alertas.pop()
+            if alerta:
+                print("\n✓ Alerta processado e removido do topo:")
+                print(f"  Detrito: {alerta['nome_detrito']} (ID: {alerta['codigo_detrito']}) | Risco: {alerta['nivel_risco']}")
+                print(f"  Evento: {alerta['descricao']}")
+            else:
+                print("\nA pilha de alertas está vazia.")
+
+        elif opcao == "3":
+            alerta = pilha_alertas.peek()
+            if alerta:
+                print("\n▲ Alerta no TOPO da pilha:")
+                print(f"  Detrito: {alerta['nome_detrito']} (ID: {alerta['codigo_detrito']}) | Risco: {alerta['nivel_risco']}")
+                print(f"  Evento: {alerta['descricao']}")
+            else:
+                print("\nA pilha de alertas está vazia.")
+
+        elif opcao == "4":
+            if pilha_alertas.is_empty():
+                print("\nA pilha de alertas está vazia.")
+            else:
+                print(f"\n=== PILHA DE ALERTAS ({pilha_alertas.size()} pendentes) - DO TOPO PARA A BASE ===")
+                for i, alerta in enumerate(pilha_alertas.listar_alertas(), 1):
+                    print(f"{i}. Detrito: {alerta['nome_detrito']} (ID: {alerta['codigo_detrito']}) | Risco: {alerta['nivel_risco']} | Evento: {alerta['descricao']}")
         else:
-            print("\nA pilha de alertas está vazia.")
+            print("Opção inválida. Escolha uma opção do menu.")
 
-    elif opcao == "3":
-        alerta = pilha_alertas.peek()
-        if alerta:
-            print(f"\n▲ Alerta no TOPO da pilha:")
-            print(f"  Detrito: {alerta['nome_detrito']} (ID: {alerta['codigo_detrito']}) | Risco: {alerta['nivel_risco']}")
-            print(f"  Evento: {alerta['descricao']}")
-        else:
-            print("\nA pilha de alertas está vazia.")
-
-    elif opcao == "4":
-        if pilha_alertas.is_empty():
-            print("\nA pilha de alertas está vazia.")
-            return
-        
-        print(f"\n=== PILHA DE ALERTAS ({pilha_alertas.size()} pendentes) - DO TOPO PARA A BASE ===")
-        for i, a in enumerate(pilha_alertas.listar_alertas(), 1):
-            print(f"{i}. Detrito: {a['nome_detrito']} (ID: {a['codigo_detrito']}) | Risco: {a['nivel_risco']} | Evento: {a['descricao']}")
+        input("\nPressione ENTER para continuar no menu de alertas...")
 
 def executar_experimento_desempenho():
     """
@@ -299,7 +318,7 @@ BG_CYAN    = "\033[46m"
 BG_BLACK   = "\033[40m"
 
 # Arte ASCII: Satélite OrbitGuard
-ARTE_ASCII = f"""{CYAN}{BOLD}
+ARTE_ASCII = rf"""{CYAN}{BOLD}
        .---.          
       /  .  \         .-----------------------------------------.
 
@@ -312,29 +331,37 @@ ARTE_ASCII = f"""{CYAN}{BOLD}
 
 def limpar_tela():
     """Limpa o terminal e reseta cores."""
-    print("\033[H\033[J", end="")
+    print(f"{RESET}\033[2J\033[H", end="")
 
-def exibir_cabecalho(titulo: str):
+def exibir_cabecalho(titulo: str, largura: int = 75):
     """Exibe o cabeçalho estilizado estilo Clipper."""
     print(f"{BG_BLUE}{WHITE}{BOLD}")
-    print("=" * 75)
-    print(f" {titulo.upper().center(73)} ")
-    print("=" * 75 + f"")
+    print("=" * largura)
+    print(f" {titulo.upper().center(largura - 2)} ")
+    print("=" * largura + RESET)
+
+
+def exibir_item_menu(opcao: str, descricao: str):
+    texto = f"[{opcao}] {descricao}"
+    destaque = RED if opcao == "0" else CYAN
+    linha = f"{destaque}{BOLD}[{opcao}]{RESET}{WHITE} {descricao}"
+    linha += " " * (71 - len(texto))
+    print(f"{BG_BLUE}{WHITE}| {linha} |{RESET}")
 
 
 def exibir_menu_principal():
     limpar_tela()
     print(ARTE_ASCII)
     exibir_cabecalho("MENU PRINCIPAL - OPERAÇÕES ORBITAIS")
-    print(f"{BG_BLUE}{WHITE}{BOLD}+{'-'*72}")
-    print(f"{BG_BLUE}{WHITE}{BOLD}|{WHITE}[1] Cadastrar Novo Detrito Espacial{' '*36}")
-    print(f"{BG_BLUE}{WHITE}{BOLD}|{WHITE}[2] Listar Todos os Detritos Catalogados{' '*31}")
-    print(f"{BG_BLUE}{WHITE}{BOLD}|{WHITE}[3] Buscar Detrito por Código (Sequencial vs Binária){' '*18}")
-    print(f"{BG_BLUE}{WHITE}{BOLD}|{WHITE}[4] Ranking por Tamanho/Massa (Ordenação por Inserção){' '*17}")
-    print(f"{BG_BLUE}{WHITE}{BOLD}|{WHITE}[5] Auditoria de Alertas Críticos (Pilha LIFO){' '*25}")
-    print(f"{BG_BLUE}{WHITE}{BOLD}|{WHITE}[6] Executar Experimento de Desempenho Algorítmico{' '*21}")
-    print(f"{BG_BLUE}{WHITE}{BOLD}|{RED}[0]{WHITE} Encerrar Sistema OrbitGuard{' '*40}")
-    print(f"{BG_BLUE}{WHITE}{BOLD}+{'-'*72}")
+    print(f"{BG_BLUE}{WHITE}{BOLD}+{'-' * 73}+{RESET}")
+    exibir_item_menu("1", "Cadastrar novo detrito espacial")
+    exibir_item_menu("2", "Listar detritos catalogados")
+    exibir_item_menu("3", "Buscar detrito por código")
+    exibir_item_menu("4", "Ranking por tamanho")
+    exibir_item_menu("5", "Auditoria de alertas críticos")
+    exibir_item_menu("6", "Experimento de desempenho algorítmico")
+    exibir_item_menu("0", "Encerrar sistema OrbitGuard")
+    print(f"{BG_BLUE}{WHITE}{BOLD}+{'-' * 73}+{RESET}")
     print()
 
 def main():
@@ -361,6 +388,8 @@ def main():
       break
     else:
       print("Opção inválida! Digite novamente.")
+
+    input("\nPressione ENTER para voltar ao menu...")
 
 
 if __name__ == "__main__":
