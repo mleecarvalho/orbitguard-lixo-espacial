@@ -39,24 +39,31 @@ def carregar_dados():
     )
 
 def listar_detritos():
-  """Exibe todos os registros de detritos carregados na memória."""
-  if not detritos:
-    print("\nNenhum detrito cadastrado na base.")
-    return
+    """Exibe todos os registros de detritos carregados na memória."""
+    if not detritos:
+        print(f"\n{YELLOW}Nenhum detrito cadastrado na base.{RESET}")
+        return
 
-  print("\n" + "=" * 80)
-  print(
-      f"{'CÓDIGO':<8} | {'NOME':<25} | {'ALT(km)':<10} | {'VEL(km/s)':<10} |"
-      f" {'TAM(m)':<8} | {'RISCO':<8}"
-  )
-  print("=" * 80)
-  for d in detritos:
-    print(
-        f"{d['codigo']:<8} | {d['nome']:<25} | {d['altitude_km']:<10.1f} |"
-        f" {d['velocidade_kms']:<10.1f} | {d['tamanho_m']:<8.2f} |"
-        f" {d['nivel_risco']:<8}"
-    )
-  print("=" * 80)
+    exibir_cabecalho("CATÁLOGO ORBITAL DE DETRITOS (LEO)")
+
+    # Cabeçalho da tabela com fundo Azul estilo Clipper
+
+    print(f"{BG_BLUE}{WHITE}{BOLD}{'CÓDIGO':<8} | {'NOME':<15} | {'ALTITUDE (KM)':<14} | {'VEL. (KM/S)':<12} | {'TAM. (M)':<9} | {'RISCO':<8}{RESET}")
+    print(f"{BLUE}{'-'*75}{RESET}")
+
+    for d in detritos:
+        # Cor condicional por nível de risco
+        risco = d['nivel_risco']
+        if risco == "Crítico":
+            cor_risco = f"{RED}{BOLD}"
+        elif risco == "Alto":
+            cor_risco = f"{YELLOW}"
+        else:
+            cor_risco = f"{GREEN}"
+
+        print(f"{WHITE}{d['codigo']:<8}{RESET} | {CYAN}{d['nome']:<15}{RESET} | {WHITE}{d['altitude_km']:<14.2f}{RESET} | {WHITE}{d['velocidade_kms']:<12.2f}{RESET} | {WHITE}{d['tamanho_m']:<9.2f}{RESET} | {cor_risco}{risco:<8}{RESET}")
+
+    print(f"{BLUE}{'='*75}{RESET}\n")
 
 def buscar_detrito():
     if not detritos:
@@ -272,22 +279,63 @@ def executar_experimento_desempenho():
     print("   14 comparações mesmo para 10.000 registros.")
     print("=" * 70 + "\n")
 
+# ==============================================================================
+# CORES E ESTILOS ANSI (ESTILO CLIPPER / MS-DOS)
+# ==============================================================================
+RESET      = "\033[0m"
+BOLD       = "\033[1m"
+
+# Cores de Texto
+BLUE       = "\033[34m"
+CYAN       = "\033[36m"
+YELLOW     = "\033[33m"
+GREEN      = "\033[32m"
+WHITE      = "\033[97m"
+RED        = "\033[31m"
+
+# Fundos (Backgrounds estilo Clipper)
+BG_BLUE    = "\033[44m"
+BG_CYAN    = "\033[46m"
+BG_BLACK   = "\033[40m"
+
+# Arte ASCII: Satélite OrbitGuard
+ARTE_ASCII = f"""{CYAN}{BOLD}
+       .---.          
+      /  .  \         .-----------------------------------------.
+
+     |\_/|\_/|       |   {YELLOW}ORBITGUARD v1.0 - SENSORIAMENTO LEO{CYAN}    |
+     |   |   |  ==== |   {WHITE}Sistema de Monitoramento e Triagem{CYAN}     |
+     |\_/|\_/|       '-----------------------------------------'
+      \  '  /         
+       '---'          
+{RESET}"""
+
+def limpar_tela():
+    """Limpa o terminal e reseta cores."""
+    print("\033[H\033[J", end="")
 
 def exibir_cabecalho(titulo: str):
-    print("\n" + "=" * 70)
-    print(f"{titulo.center(70)}")
-    print("=" * 70)
+    """Exibe o cabeçalho estilizado estilo Clipper."""
+    print(f"{BG_BLUE}{WHITE}{BOLD}")
+    print("=" * 75)
+    print(f" {titulo.upper().center(73)} ")
+    print("=" * 75 + f"")
+
 
 def exibir_menu_principal():
-    exibir_cabecalho("ORBITGUARD - SISTEMA DE MONITORAMENTO ORBITAL")
-    print(" [1] Cadastrar Detrito Espacial")
-    print(" [2] Listar Todos os Detritos")
-    print(" [3] Buscar Detrito por Código (Sequencial vs Binária)")
-    print(" [4] Ranking por Tamanho (Ordenação por Inserção)")
-    print(" [5] Auditoria de Alertas Críticos (Estrutura de Pilha)")
-    print(" [6] Experimento de Desempenho Algorítmico")
-    print(" [0] Sair do Sistema")
-    print("-" * 70)
+    limpar_tela()
+    print(ARTE_ASCII)
+    exibir_cabecalho("MENU PRINCIPAL - OPERAÇÕES ORBITAIS")
+    print(f"{BG_BLUE}{WHITE}{BOLD}+{'-'*72}")
+    print(f"{BG_BLUE}{WHITE}{BOLD}|{WHITE}[1] Cadastrar Novo Detrito Espacial{' '*36}")
+    print(f"{BG_BLUE}{WHITE}{BOLD}|{WHITE}[2] Listar Todos os Detritos Catalogados{' '*31}")
+    print(f"{BG_BLUE}{WHITE}{BOLD}|{WHITE}[3] Buscar Detrito por Código (Sequencial vs Binária){' '*18}")
+    print(f"{BG_BLUE}{WHITE}{BOLD}|{WHITE}[4] Ranking por Tamanho/Massa (Ordenação por Inserção){' '*17}")
+    print(f"{BG_BLUE}{WHITE}{BOLD}|{WHITE}[5] Auditoria de Alertas Críticos (Pilha LIFO){' '*25}")
+    print(f"{BG_BLUE}{WHITE}{BOLD}|{WHITE}[6] Executar Experimento de Desempenho Algorítmico{' '*21}")
+    print(f"{BG_BLUE}{WHITE}{BOLD}|{RED}[0]{WHITE} Encerrar Sistema OrbitGuard{' '*40}")
+    print(f"{BG_BLUE}{WHITE}{BOLD}+{'-'*72}")
+    print()
 
 def main():
   """Laço principal do menu inicial."""
